@@ -1,46 +1,44 @@
-# DBMS Laboratory Manual Submission
+# ER Diagram Submission - ASWIKA B(212224220013)
 
-## 🎓 Course: 19CS404 Database Management System and its Applications  
-## 🧑‍🏫 Instructor: Ms. G Abinaya 
+## Scenario Chosen:
+University
 
-![image](https://github.com/user-attachments/assets/7e6f9751-b530-4526-9a3d-8e322e3b2e6d)
+## ER Diagram:
 
-### 📝 Instructions for Students
+![image](https://github.com/user-attachments/assets/469fcbf7-49c2-434c-9374-52161dc36bd5)
 
-1. Fork this repository to your GitHub profile.
-2. For each experiment:
-   SQL queries based on questions generated randomly from Moodle.
-   - Complete the question on Moodle.
-   - Each experiment folder contains **two Markdown files**
-     1. `README.md`
 
-        This file contains:
-         - 🎯 **Aim**
-         - 📚 **Theory**
-         - 📝 **Result**
-        
-        You **do not need to edit** this file unless instructed.
-      3. `output.md`
 
-         You **must update this file** with your answers and outputs.
-         For each of the 10 Moodle-generated questions:
-         - Paste the **question**
-         - Write the **SQL query** inside the code block
-         - Paste a **screenshot or terminal output** below it
-3. Commit and push your changes.
-4. Create a pull request to the original repository
+## Entities and Attributes:
 
-### ✅ Experiments List
+STUDENT: REG_NO, STUDENT_NAME,EMAIL,PHONE_NO,D.O.B.
+COURSE: COURSE_NAME, COURSE_ID, PREREQUISITE,NO_OF_CREDITS.
+INSTRUCTOR:NAME,STAFF_ID,CONTACT,EMAIL,PHONE_NO.
 
-| Exp No | Title                          | Module Based? |
-|--------|--------------------------------|---------------|
-| 1      | ER Diagram                     | No            |
-| 2      | DDL Commands                   | Yes           |
-| 3      | DML Commands                   | Yes           |
-| 4      | Aggregate, GROUP BY, HAVING   | Yes           |
-| 5      | Subqueries and Views          | Yes           |
-| 6      | Joins                         | Yes           |
-| 7      | Pl/sql                        | No            |
-| 8      | Procedures, Functions         | No            |
-| 9      | Cursors, Exception Handling   | No            |
-| 10     | Triggers                      | No            |
+## Relationships and Constraints:
+
+
+ENROLLMENT: STUDENT enrolls in COURSE (Cardinality and Participation are not explicitly shown, but it implies a many-to-many relationship where a student can enroll in multiple courses and each course can have multiple students. Participation is likely total for ENROLLMENT and partial for both STUDENT and COURSE).
+
+TEACHES: INSTRUCTOR teaches COURSE (This implies a one-to-many relationship where one instructor can teach multiple courses, but each course is taught by one instructor. Participation is likely total for COURSE and partial for INSTRUCTOR).
+
+PREREQUISITE: COURSE has PREREQUISITE (This is a reflexive relationship on the COURSE entity, indicating that a course can be a prerequisite for another course. It is likely an optional many-to-one or many-to-many relationship, where a course can have zero or more prerequisites and can itself be a prerequisite for multiple other courses).```
+
+## Extension (Prerequisite / Billing):
+
+Prerequisite: Prerequisites are modeled through a reflexive relationship on the COURSE entity. The attribute
+PREREQUISIT (which should likely be PREREQ_ID to reference another course's ID) in the COURSE entity indicates which course(s)
+are required before taking a particular course. This structure allows for defining chains or multiple prerequisites for a single course.
+
+Billing: Billing information is partially modeled through the FEE attribute in the STUDENT entity. This suggests that each student
+has an associated fee. However, the diagram doesn't provide details on when or how these fees are applied (e.g., per program, per
+semester, per course) or any information about payment status, due dates, or billing history. To model billing more comprehensively,
+ you might need additional entities like BILL, PAYMENT, or a more detailed structure within the REGISTRATION or a new enrollment-specific entity to track financial aspects.
+
+
+## Design Choices:
+
+This ER diagram provides a good foundation for a student registration system, capturing key entities and their relationships.
+However, depending on the specific requirements, further refinement might be needed, especially in areas like billing and a clearer
+definition of the 'TYPE' attribute in the REGISTRATION entity.
+
