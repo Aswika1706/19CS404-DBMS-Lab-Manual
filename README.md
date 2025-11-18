@@ -1,76 +1,147 @@
-## Experiment 7: PL/SQL – Variables, Control Structures and Loops
+## Experiment 4: Aggregate Functions, Group By and Having Clause
 ## AIM
-To write and execute simple PL/SQL programs using variables, loops, and conditional statements.
+To study and implement aggregate functions, GROUP BY, and HAVING clause with suitable examples.
 
 ## THEORY
-PL/SQL, which stands for Procedural Language extensions to the Structured Query Language (SQL). It is a combination of SQL along with the procedural features of programming languages.
+Aggregate Functions
+These perform calculations on a set of values and return a single value.
 
+* MIN() – Smallest value
+* MAX() – Largest value
+* COUNT() – Number of rows
+* SUM() – Total of values
+* AVG() – Average of values
+Syntax:+++ 
+```
+SELECT AGG_FUNC(column_name) FROM table_name WHERE condition;
+```
+## GROUP BY
+Groups records with the same values in specified columns.
 Syntax:
 ```
-DECLARE 
-   <declarations section> 
-BEGIN 
-   <executable command(s)>
-EXCEPTION 
-   <exception handling> 
-END;
+SELECT column_name, AGG_FUNC(column_name)
+FROM table_name
+GROUP BY column_name;
 
 ```
-Basic Components of PL/SQL Block:
-* DECLARE: Section to declare variables and constants.
-* BEGIN: The execution section that contains PL/SQL statements.
-* EXCEPTION: Handles errors or exceptions that occur in the program.
-* END: Marks the end of the PL/SQL block.
-## PL/SQL Programs – Steps and Expected Output
-1. Write a PL/SQL program to find the Greatest of Two Numbers
-Steps:
-* Declare two numeric variables and initialize them.
-* Use an IF statement to compare the values.
-* Display the greater number using DBMS_OUTPUT.PUT_LINE.
-  
-Expected Output:
-Greater number is: 80
+## HAVING
+Filters the grouped records based on aggregate conditions. 
+Syntax:
+```
+SELECT column_name, AGG_FUNC(column_name)
+FROM table_name
+GROUP BY column_name
+HAVING condition;
 
-## 2. Write a PL/SQL program to Calculate Sum of First N Natural Numbers
-Steps:
-* Declare a variable n and assign a value (e.g., 10).
-* Initialize a sum variable to 0.
-* Use a WHILE loop to iterate from 1 to n, adding each number to the sum.
-* Display the result using DBMS_OUTPUT.PUT_LINE.
-  
-Expected Output:
-Sum of first 10 natural numbers is: 55
+```
+## Question 1
+How many appointments are scheduled for each patient?
+```
+select PatientID, COUNT(*) AS TotalAppointments
+from Appointments group by PatientID;
 
-## 3. Write a PL/SQL program to generate Fibonacci series
-Steps:
-* Declare the variable n to indicate how many terms to generate.
-* Initialize the first two Fibonacci numbers (0 and 1).
-* Use a loop to generate the next terms using the formula c = a + b.
-* Print each term in the series.
-  
-Expected Output:
-n = 7
-Fibonacci sequence: 0, 1, 1, 2, 3, 5, 8
+```
+Output:
+<img width="1262" height="748" alt="Screenshot 2025-11-18 115731" src="https://github.com/user-attachments/assets/9e27acd9-1ace-415f-8f3b-d2f56f257915" />
 
-## 4. Write a PL/SQL Program to display the number in Reverse Order
-Steps:
-* Declare a variable n and assign a value (e.g., 1535).
-* Use a loop to extract each digit using modulo and reverse the number.
-* Display the reversed number.
-  
-Expected Output:
-n = 1535
-Reversed number is 5351
+## Question 2
+What is the most common diagnosis among patients?
+```
+select Diagnosis, COUNT(*) AS DiagnosisCount
+from MedicalRecords
+group by Diagnosis
+order by DiagnosisCount DESC LIMIT 1;
 
-## 5. Write a PL/SQL program to find the largest of three numbers
-Steps:
-* Declare three numeric variables a, b, and c.
-* Use nested IF-ELSIF-ELSE conditions to find the largest among the three.
-* Display the largest number.
-  
-Expected Output:
-a = 10, b = 9, c = 15
-Largest of three number is 15
+```
+Output:
+<img width="1062" height="387" alt="Screenshot 2025-11-18 222945" src="https://github.com/user-attachments/assets/8e3893cb-81c4-44ca-a60c-6df720983a5d" />
 
-## RESULT
-Thus, the PL/SQL programs using variables, conditionals, and loops were executed successfully.
+## Question 3
+Write a SQL query to find the total amount of fruits with a unit type of 'LB'.
+```
+select SUM(inventory) AS total 
+from Fruits
+where unit = 'LB';
+```
+Output:
+<img width="719" height="467" alt="Screenshot 2025-11-18 223038" src="https://github.com/user-attachments/assets/382c29bb-1c62-4780-8ddc-3c47cea98fd8" />
+
+## Question 4
+Write a SQL query to calculate the average purchase amount of all orders. Return average purchase amount.
+```
+select AVG(purch_amt) as 'AVERAGE'
+from orders;
+
+```
+Output:
+<img width="591" height="474" alt="Screenshot 2025-11-18 225114" src="https://github.com/user-attachments/assets/371a7d07-7d21-4cae-954c-629580ed78eb" />
+
+## Question 5
+Write a SQL query to find the total number of unique cities in the customer table?
+```
+select COUNT(DISTINCT city) AS
+unique_cities
+from customer;
+
+```
+Output:
+<img width="574" height="487" alt="Screenshot 2025-11-18 225737" src="https://github.com/user-attachments/assets/5b906cb7-c282-4bc3-ba08-4821388b2131" />
+
+## Question 6
+Write a SQL query to find the customer with longest name?
+```
+select name,LENGTH(name) as length
+from customer order by length DESC limit 1
+
+```
+Output:
+<img width="957" height="471" alt="Screenshot 2025-11-18 230009" src="https://github.com/user-attachments/assets/0eed2a8b-3925-436c-a247-528c3d26e2c6" />
+
+## Question 7
+Write the SQL query that accomplishes the grouping of data by joining date (jdate), calculates the total work hours for each date, and excludes dates where the total work hour sum is not greater than 40.
+```
+select jdate, SUM(workhour) 
+from employee1
+group by jdate
+having SUM(workhour) > 40;
+
+```
+Output:
+<img width="827" height="569" alt="Screenshot 2025-11-18 230314" src="https://github.com/user-attachments/assets/debf42a9-8953-4f7e-8ed2-7de391df18c7" />
+
+## Question 8
+Write the SQL query that achieves the grouping of data by city, calculates the total income for each city, and includes only those cities where the total income sum is greater than 200,000.
+```
+select city, SUM(income ) AS Income
+from employee
+group by city
+having SUM(income) > 200000;
+
+```
+Ouput:
+<img width="818" height="751" alt="Screenshot 2025-11-18 230528" src="https://github.com/user-attachments/assets/300a4b25-5c29-4c56-acff-945aea52beea" />
+
+## Question 9
+Write the SQL query that achieves the grouping of data by occupation, calculates the total work hours for each occupation, and excludes occupations where the total work hour sum is not greater than 20.
+```
+select occupation, SUM(workhour)
+from employee1
+group by occupation
+having SUM(workhour) > 20;
+
+```
+Output:
+<img width="845" height="656" alt="Screenshot 2025-11-18 231944" src="https://github.com/user-attachments/assets/812208bd-0a5f-4a6c-a790-082381fda2ce" />
+
+## Question 10
+What is the count of male and female patients?
+```
+SELECT Gender , COUNT(*) as TotalPatients from Patients
+Group by Gender;
+
+```
+Output:
+<img width="1110" height="652" alt="Screenshot 2025-11-18 232048" src="https://github.com/user-attachments/assets/19b9e9e3-37a5-488a-8b14-f398b730e0d7" />
+
+## Result:
+Thus, the SQL queries to implement aggregate functions, GROUP BY, and HAVING clause have been executed successfully.
