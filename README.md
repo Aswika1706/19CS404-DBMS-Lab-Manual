@@ -1,296 +1,294 @@
-## Experiment 5: Subqueries and Views
+## Experiment 6: Joins
 ## AIM
-To study and implement subqueries and views.
+To study and implement different types of joins.
 
 ## THEORY
-Subqueries
-A subquery is a query inside another SQL query and is embedded in:
+SQL Joins are used to combine records from two or more tables based on a related column.
 
-* WHERE clause
-* HAVING clause
-* FROM clause
-  
-## Types:
+1. INNER JOIN
+Returns records with matching values in both tables.
 
-* Single-row subquery: Sub queries can also return more than one value. Such results should be made use along with the operators in and any.
-* Multiple-row subquery: Here more than one subquery is used. These multiple sub queries are combined by means of ‘and’ & ‘or’ keywords.
-* Correlated subquery: A subquery is evaluated once for the entire parent statement whereas a correlated Sub query is evaluated once per row processed by the parent statement.
-  
-Example:
+Syntax:
 ```
-SELECT * FROM employees
-WHERE salary > (SELECT AVG(salary) FROM employees);
+SELECT columns
+FROM table1
+INNER JOIN table2
+ON table1.column = table2.column;
 
 ```
-## Views
-A view is a virtual table based on the result of an SQL SELECT query. Create View:
+2. LEFT JOIN
+Returns all records from the left table, and matched records from the right.
+
+Syntax:
 ```
-CREATE VIEW view_name AS
-SELECT column1, column2 FROM table_name WHERE condition;
+SELECT columns
+FROM table1
+LEFT JOIN table2
+
+ON table1.column = table2.column;
 
 ```
-## Drop View:
+3. RIGHT JOIN
+Returns all records from the right table, and matched records from the left.
+
+Syntax:
 ```
-DROP VIEW view_name;
+SELECT columns
+FROM table1
+RIGHT JOIN table2
+ON table1.column = table2.column;
+
+```
+4. FULL OUTER JOIN
+Returns all records when there is a match in either left or right table.
+
+Syntax:
+```
+SELECT columns
+FROM table1
+FULL OUTER JOIN table2
+ON table1.column = table2.column;
 
 ```
 ## Question 1
-Write a SQL query that retrieve all the columns from the table "Grades", where the grade is equal to the maximum grade achieved in each subject. Sample table: GRADES (attributes: student_id, student_name, subject, grade)
+SQL statement to generate a report with customer name, city, order number, order date, order amount, salesperson name, and commission to determine if any of the existing customers have not placed orders or if they have placed orders through their salesman or by themselves.
+Sample table: customer
+
+ customer_id |   cust_name    |    city    | grade | salesman_id 
+-------------+----------------+------------+-------+-------------
+        3002 | Nick Rimando   | New York   |   100 |        5001
+        3007 | Brad Davis     | New York   |   200 |        5001
+        3005 | Graham Zusi    | California |   200 |        5002
+        3008 | Julian Green   | London     |   300 |        5002
+        3004 | Fabian Johnson | Paris      |   300 |        5006
+        3009 | Geoff Cameron  | Berlin     |   100 |        5003
+        3003 | Jozy Altidor   | Moscow     |   200 |        5007
+        3001 | Brad Guzan     | London     |       |        5005
+
+        Sample table: orders
+
+ord_no      purch_amt   ord_date    customer_id  salesman_id
+----------  ----------  ----------  -----------  -----------
+70001       150.5       2012-10-05  3005         5002
+70009       270.65      2012-09-10  3001         5005
+70002       65.26       2012-10-05  3002         5001
+70004       110.5       2012-08-17  3009         5003
+70007       948.5       2012-09-10  3005         5002
+70005       2400.6      2012-07-27  3007         5001
+70008       5760        2012-09-10  3002         5001
+70010       1983.43     2012-10-10  3004         5006
+70003       2480.4      2012-10-10  3009         5003
+70012       250.45      2012-06-27  3008         5002
+70011       75.29       2012-08-17  3003         5007
+70013       3045.6      2012-04-25  3002         5001
+
+Sample table: salesman
+
+ salesman_id |    name    |   city   | commission 
+-------------+------------+----------+------------
+        5001 | James Hoog | New York |       0.15
+        5002 | Nail Knite | Paris    |       0.13
+        5005 | Pit Alex   | London   |       0.11
+        5006 | Mc Lyon    | Paris    |       0.14
+        5007 | Paul Adam  | Rome     |       0.13
+        5003 | Lauson Hen | San Jose |       0.12
+
 ```
-SELECT *
-FROM GRADES g
-WHERE grade = (
-    SELECT MAX(grade)
-    FROM GRADES
-    WHERE subject = g.subject
-);
+SELECT 
+    c.cust_name,
+    c.city,
+    o.ord_no,
+    o.ord_date,
+    o.purch_amt AS "Order Amount",
+    s.name ,
+    s.commission
+FROM 
+    customer c
+LEFT JOIN 
+    orders o ON c.customer_id = o.customer_id
+LEFT JOIN 
+    salesman s ON o.salesman_id = s.salesman_id;
 
 ```
 Output:
-<img width="1015" height="299" alt="Screenshot 2025-11-19 012244" src="https://github.com/user-attachments/assets/143d9ea3-72e9-4e06-9d91-a5cfc04147c7" />
+<img width="1268" height="260" alt="Screenshot 2025-11-19 164902" src="https://github.com/user-attachments/assets/c584bef9-f017-49ba-b521-5f5e99fc50a6" />
 
 ## Question 2
-Write a SQL query to Identify customers whose city is different from the city of the customer with the highest ID
-SAMPLE TABLE: customer
-```
-name             type
----------------  ---------------
-id               INTEGER
-name             TEXT
-city             TEXT
-email            TEXT
-phone            INTEGER
+Write the SQL query that achieves the selection of all columns from the "patients" table (aliased as "p"), with an inner join on the "patient_id" column and a condition filtering for appointments with an appointment date between '2024-01-01' and '2024-01-31'.
 
-```
-```
-SELECT *
-FROM customer
-WHERE city <> (
-    SELECT city
-    FROM customer
-    WHERE id = (SELECT MAX(id) FROM customer)
-);
+PATIENTS TABLE:
 
+ATTRIBUTES - patient_id, first_name, last_name, date_of_birth, admission_date,discharge_date, doctor_id
 ```
-## Question 3
-Write a SQL query to retrieve all columns from the CUSTOMERS table for customers whose salary is LESS than $2500.
-Sample table: CUSTOMERS
-```
-ID          NAME        AGE         ADDRESS     SALARY
-----------  ----------  ----------  ----------  ----------
-
-1          Ramesh     32              Ahmedabad     2000
-2          Khilan        25              Delhi                 1500
-3          Kaushik      23              Kota                  2000
-4          Chaitali       25             Mumbai            6500
-5          Hardik        27              Bhopal              8500
-6          Komal         22              Hyderabad       4500
-
-7           Muffy          24              Indore            10000
-
-```
-```
-SELECT *
-FROM CUSTOMERS
-WHERE SALARY < 2500;
+SELECT p.*
+FROM patients p
+INNER JOIN appointments a ON p.patient_id = a.patient_id
+WHERE a.appointment_date BETWEEN '2024-01-01' AND '2024-01-31';
 
 ```
 Output:
-<img width="1008" height="356" alt="Screenshot 2025-11-19 012601" src="https://github.com/user-attachments/assets/f49ae568-3fd3-4812-a231-c1bcd24f5005" />
+<img width="1269" height="253" alt="Screenshot 2025-11-19 165324" src="https://github.com/user-attachments/assets/97d8390c-e915-4afd-acb0-5b4456f81cab" />
+
+## Question 3
+From the following tables write a SQL query to find salespeople who received commissions of more than 12 percent from the company. Return Customer Name, customer city, Salesman, commission.
+
+Sample table: customer
+
+ customer_id |   cust_name    |    city    | grade | salesman_id 
+-------------+----------------+------------+-------+-------------
+        3002 | Nick Rimando   | New York   |   100 |        5001
+        3007 | Brad Davis     | New York   |   200 |        5001
+        3005 | Graham Zusi    | California |   200 |        5002
+        3008 | Julian Green   | London     |   300 |        5002
+        3004 | Fabian Johnson | Paris      |   300 |        5006
+        3009 | Geoff Cameron  | Berlin     |   100 |        5003
+        3003 | Jozy Altidor   | Moscow     |   200 |        5007
+        3001 | Brad Guzan     | London     |       |        5005
+
+Sample table: salesman
+
+ salesman_id |    name    |   city   | commission 
+-------------+------------+----------+------------
+        5001 | James Hoog | New York |       0.15
+        5002 | Nail Knite | Paris    |       0.13
+        5005 | Pit Alex   | London   |       0.11
+        5006 | Mc Lyon    | Paris    |       0.14
+        5007 | Paul Adam  | Rome     |       0.13
+        5003 | Lauson Hen | San Jose |       0.12
+```
+SELECT c.cust_name AS "Customer Name", 
+       c.City AS "city", 
+       s.name AS "Salesman", 
+       s.commission
+FROM customer c
+INNER JOIN salesman s ON c.salesman_id = s.salesman_id
+WHERE s.commission > 0.12;
+
+```
+
+Output:
+<img width="1161" height="636" alt="Screenshot 2025-11-19 170020" src="https://github.com/user-attachments/assets/a1fb379d-861a-455c-83c9-5c6cfdfbbf21" />
 
 ## Question 4
-From the following tables write a SQL query to count the number of customers with grades above the average in New York City. Return grade and count.
-customer table
-```
-name         type
------------  ----------
-customer_id  int
-cust_name    text
-city         text
-grade        int
-salesman_id  int
+Write the SQL query that achieves the selection of the first name from the "patients" table (aliased as "patient_name") and all columns from the "appointments" table (aliased as "a"), with an inner join on the "patient_id" column.
+
+PATIENTS TABLE:
+
+* ATTRIBUTES - patient_id, first_name, last_name, date_of_birth, admission_date, discharge_date, doctor_id
+
+* APPOINTMENTS TABLE:
+
+* ATTRIBUTES - appointment_id, patient_id, doctor_id, appointment_date
 
 ```
-```
-SELECT grade, COUNT(*)
-FROM customer
-WHERE  grade > (SELECT AVG(grade) FROM customer WHERE city = 'New York')
-GROUP BY grade;
+SELECT p.first_name AS patient_name, 
+       a.*
+FROM patients p
+INNER JOIN appointments a ON p.patient_id = a.patient_id;
+
 ```
 Output:
-<img width="782" height="409" alt="Screenshot 2025-11-19 012827" src="https://github.com/user-attachments/assets/bdb533b9-dbfb-4160-a8de-28254d07123c" />
+<img width="1056" height="976" alt="Screenshot 2025-11-19 171249" src="https://github.com/user-attachments/assets/c614014b-5324-4296-a35f-dcb651e77473" />
 
 ## Question 5
-Write a SQL query to retrieve all columns from the CUSTOMERS table for customers whose Address as Delhi
-Sample table: CUSTOMERS
+From the following tables write a SQL query to find salespeople who received commissions of more than 12 percent from the company. Return Customer Name, customer city, Salesman, commission.
+
+Sample table: customer
 ```
-ID          NAME        AGE         ADDRESS     SALARY
-----------  ----------  ----------  ----------  ----------
-
-1          Ramesh     32              Ahmedabad     2000
-2          Khilan        25              Delhi                 1500
-3          Kaushik      23              Kota                  2000
-4          Chaitali       25             Mumbai            6500
-5          Hardik        27              Bhopal              8500
-6          Komal         22              Hyderabad       4500
-
-7           Muffy          24              Indore            10000
+SELECT c.cust_name AS "Customer Name",
+       c.city AS "city",
+       s.name AS "Salesman",
+       s.commission AS "commission"
+FROM customer c
+JOIN salesman s ON c.salesman_id = s.salesman_id
+WHERE s.commission > 0.12;
 
 ```
-
-```
-SELECT *
-FROM CUSTOMERS
-WHERE ADDRESS = 'Delhi';
-
-```
-Output:
-<img width="1019" height="259" alt="Screenshot 2025-11-19 013022" src="https://github.com/user-attachments/assets/da8e1932-c419-4d88-9a10-fc3b363579ac" />
+Ouput:
+<img width="1049" height="948" alt="Screenshot 2025-11-19 171452" src="https://github.com/user-attachments/assets/be63708b-7c13-41cc-abd8-dba04bcb2c39" />
 
 ## Question 6
-From the following tables write a SQL query to find the order values greater than the average order value of 10th October 2012. Return ord_no, purch_amt, ord_date, customer_id, salesman_id.
-Note: date should be yyyy-mm-dd format
-ORDERS TABLE
+write a SQL query to find the salesperson and customer who reside in the same city. Return Salesman, cust_name and city.
 ```
-name            type
-----------     ----------
-ord_no          int
-purch_amt    real
-ord_date       text
-customer_id  int
-salesman_id  int
-
-```
-```
-SELECT ord_no, purch_amt, ord_date, customer_id, salesman_id
-FROM ORDERS
-WHERE purch_amt > (
-    SELECT AVG(purch_amt)
-    FROM ORDERS
-    WHERE ord_date = '2012-10-10'
-);
+SELECT
+    s.name AS Salesman,
+    c.cust_name,
+    s.city
+FROM
+    salesman s
+INNER JOIN
+    customer c ON s.city = c.city;
 
 ```
 Output:
-<img width="1022" height="351" alt="Screenshot 2025-11-19 013241" src="https://github.com/user-attachments/assets/51fe526d-b514-4a4c-816a-09d245bae14d" />
+<img width="1056" height="915" alt="Screenshot 2025-11-19 173038" src="https://github.com/user-attachments/assets/73f0c5eb-46e8-435a-ba78-b561f3ee36a8" />
+
 
 ## Question 7
-From the following tables write a SQL query to find all orders generated by New York-based salespeople. Return ord_no, purch_amt, ord_date, customer_id, salesman_id.
-salesman table
-```
-name             type
----------------  ---------------
-salesman_id      numeric(5)
-name                 varchar(30)
-city                    varchar(15)
-commission       decimal(5,2)
+From the following tables write a SQL query to find those customers with a grade less than 300. Return cust_name, customer city, grade, Salesman, salesmancity. The result should be ordered by ascending customer_id.
 
-```
-```
-name             type
----------------  --------
-order_no         int
-purch_amt        real
-order_date       text
-customer_id      int
-salesman_id      int
-
-```
-```
-SELECT o.ord_no, o.purch_amt, o.ord_date, o.customer_id, o.salesman_id
-FROM orders o
-JOIN salesman s ON o.salesman_id = s.salesman_id
-WHERE s.city = 'New York';
+SELECT c.cust_name,
+       c.city,
+       c.grade,
+       s.name AS Salesman,
+       s.city AS city
+```       
+FROM customer c
+JOIN salesman s ON c.salesman_id = s.salesman_id
+WHERE c.grade < 300
+ORDER BY c.customer_id ASC;
 
 ```
 Output:
-<img width="1018" height="360" alt="Screenshot 2025-11-19 013454" src="https://github.com/user-attachments/assets/01768530-2f1f-4b81-864b-f97172382603" />
+<img width="1056" height="890" alt="Screenshot 2025-11-19 173457" src="https://github.com/user-attachments/assets/736bfa62-cff0-469d-8de9-3719146447db" />
 
 ## Question 8
-From the following tables, write a SQL query to find those salespeople who earned the maximum commission. Return ord_no, purch_amt, ord_date, and salesman_id.
-
-salesman table
+From the following tables write a SQL query to find the salesperson(s) and the customer(s) he represents. Return Customer Name, city, Salesman, commission.
 ```
-name             type
----------------  ---------------
-salesman_id      numeric(5)
-name                 varchar(30)
-city                    varchar(15)
-commission       decimal(5,2)
-
-```
-```
-name             type
----------------  --------
-order_no         int
-purch_amt        real
-order_date       text
-customer_id      int
-salesman_id      int
-```
-```
-SELECT o.ord_no, o.purch_amt, o.ord_date, o.salesman_id
-FROM orders o
-JOIN salesman s ON o.salesman_id = s.salesman_id
-WHERE s.commission = (
-    SELECT MAX(commission)
-    FROM salesman
-);
+SELECT c.cust_name AS "Customer Name",
+       c.city,
+       s.name AS "Salesman",
+       s.commission
+FROM customer c
+JOIN salesman s ON c.salesman_id = s.salesman_id;
 
 ```
 Output:
-<img width="1017" height="442" alt="Screenshot 2025-11-19 014009" src="https://github.com/user-attachments/assets/5bf43a4e-36a8-4b1d-a4e3-606791041e4f" />
+<img width="1040" height="939" alt="Screenshot 2025-11-19 173618" src="https://github.com/user-attachments/assets/cc5955ca-8c3a-49bc-a14e-8a71ed7dc73f" />
 
 ## Question 9
-From the following tables, write a SQL query to find all the orders generated in New York city. Return ord_no, purch_amt, ord_date, customer_id and salesman_id.
-
-SALESMAN TABLE
+Write a SQL statement to join the tables salesman, customer and orders so that the same column of each table appears once and only the relational rows are returned.
 ```
-name               type
------------        ----------
-salesman_id  numeric(5)
-name             varchar(30)
-city                 varchar(15)
-commission   decimal(5,2)
-
-```
-```
-name            type
-----------      ----------
-ord_no          int
-purch_amt    real
-ord_date       text
-customer_id  int
-salesman_id  int
-
-```
-```
-SELECT o.ord_no, o.purch_amt, o.ord_date, o.customer_id, o.salesman_id
+SELECT o.ord_no,
+       o.purch_amt,
+       o.ord_date,
+       c.cust_name,
+       c.city AS customer_city,
+       c.grade,
+       s.name AS salesman_name,
+       s.city AS salesman_city,
+       s.commission
 FROM orders o
-JOIN salesman s ON o.salesman_id = s.salesman_id
-WHERE s.city = 'New York';
+JOIN customer c ON o.customer_id = c.customer_id
+JOIN salesman s ON o.salesman_id = s.salesman_id;
 
 ```
 Output:
-<img width="1021" height="386" alt="Screenshot 2025-11-19 014237" src="https://github.com/user-attachments/assets/26e53bbc-7fb0-41fe-ba91-5eb6da01df3d" />
+<img width="1061" height="943" alt="Screenshot 2025-11-19 173917" src="https://github.com/user-attachments/assets/c2e4654a-de76-4654-b93b-107834938f31" />
 
 ## Question 10
-Write a SQL query that retrieves the all the columns from the Table Grades, where the grade is equal to the minimum grade achieved in each subject.
-
-Sample table: GRADES (attributes: student_id, student_name, subject, grade)
+Question 10
+Write the SQL query that achieves the selection of the first name from the "patients" table (aliased as "patient_name") and the first name from the "doctors" table (aliased as "doctor_name"), with an inner join on the "doctor_id" column and a condition filtering for patients with a date of birth after '1990-01-01'.
 ```
-SELECT student_id, student_name, subject, grade
-FROM Grades g
-WHERE grade = (
-    SELECT MIN(grade)
-    FROM Grades
-    WHERE subject = g.subject
-);
+SELECT p.first_name AS patient_name,
+       d.first_name AS doctor_name
+FROM patients p
+INNER JOIN doctors d ON p.doctor_id = d.doctor_id
+WHERE p.date_of_birth > '1990-01-01';
 
 ```
 Output:
-<img width="1016" height="301" alt="Screenshot 2025-11-19 014512" src="https://github.com/user-attachments/assets/4973ed9d-5344-4ac0-ad59-c5d7ecee6d72" />
+<img width="1053" height="515" alt="Screenshot 2025-11-19 174200" src="https://github.com/user-attachments/assets/ba001a6f-18bc-4fb0-b5d0-0cb861be5cc7" />
 
-## RESULT:
-Thus, the SQL queries to implement subqueries and views have been executed successfully.
-
+## RESULT
+Thus, the SQL queries to implement different types of joins have been executed successfully.
